@@ -1,6 +1,8 @@
 package com.desafio.oak.Controllers;
 
 
+import com.desafio.oak.Controllers.mappers.ProductMapper;
+import com.desafio.oak.Controllers.response.ProductResponse;
 import com.desafio.oak.dtos.ProductRecordDto;
 import com.desafio.oak.models.ProductModel;
 import com.desafio.oak.services.ProductService;
@@ -22,18 +24,20 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<ProductModel>> getAllProducts() {
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductModel> products = productService.findAllOrderByPriceAsc();
-        return ResponseEntity.status(HttpStatus.OK).body(products);
+        var response = ProductMapper.mapToProductResponse(products);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ProductModel> saveProduct(@RequestBody ProductRecordDto productRecordDto) {
+    public ResponseEntity<Void> saveProduct(@RequestBody ProductRecordDto productRecordDto) {
 
         var productModel = new ProductModel();
         BeanUtils.copyProperties(productRecordDto, productModel);
         productService.save(productModel);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productModel);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
